@@ -54,9 +54,9 @@ public class AuthController {
                 .body(new ErrorResponse("Username already taken"));
         }
         
-        // Create new user
+        // Create new user - name can be null
         String hashedPassword = passwordEncoder.encode(request.password());
-        User user = new User(request.email(), request.username(), hashedPassword);
+        User user = new User(request.email(), request.username(), null, hashedPassword, com.staybits.gigmapapi.authentication.domain.model.valueobjects.Role.valueOf(request.role()));
         
         User savedUser = userRepository.save(user);
         
@@ -71,7 +71,8 @@ public class AuthController {
             savedUser.getId(),
             savedUser.getEmail(),
             savedUser.getUsername(),
-            savedUser.isArtist(),
+            savedUser.getName() != null ? savedUser.getName() : "",
+            savedUser.getRole().name(),
             token,
             "User registered successfully"
         );
@@ -113,7 +114,8 @@ public class AuthController {
             user.getId(),
             user.getEmail(),
             user.getUsername(),
-            user.isArtist(),
+            user.getName() != null ? user.getName() : "",
+            user.getRole().name(),
             token,
             "Login successful"
         );

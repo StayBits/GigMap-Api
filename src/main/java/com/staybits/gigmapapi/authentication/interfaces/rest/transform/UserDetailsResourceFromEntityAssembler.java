@@ -6,23 +6,14 @@ import com.staybits.gigmapapi.authentication.interfaces.rest.resources.UserDetai
 public class UserDetailsResourceFromEntityAssembler {
     
     public static UserDetailsResource toResourceFromEntity(User entity) {
-        UserDetailsResource.ArtistDetailsResource artistDetails = null;
-        
-        if (entity.isArtist() && entity.getArtist() != null) {
-            var artist = entity.getArtist();
-            artistDetails = new UserDetailsResource.ArtistDetailsResource(
-                artist.getArtistName(),
-                artist.getBio(),
-                artist.getGenres()
-            );
-        }
-        
         return new UserDetailsResource(
             entity.getId(),
             entity.getEmail(),
             entity.getUsername(),
-            entity.isArtist(),
-            artistDetails
+            entity.getRole().name(),
+            entity.getImagenUrl(),
+            entity.getDescripcion(),
+            entity.getBannerUrl()
         );
     }
 }

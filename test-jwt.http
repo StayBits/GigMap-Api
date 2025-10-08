@@ -4,17 +4,27 @@
 @baseUrl = http://localhost:8080
 @token = 
 
-### 1. Register new user
+### 1. Register new user (without name field)
 POST {{baseUrl}}/api/v1/auth/register
 Content-Type: application/json
 
 {
   "email": "test@gigmap.com",
   "username": "testuser",
-  "password": "password123"
+  "password": "password123",
+  "role": "USER"
 }
 
-### 2. Login (get token)
+### 1b. Register another user (without name field)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "test2@gigmap.com",
+  "username": "testuser2",
+  "password": "password123",
+  "role": "USER"
+}
 # @name login
 POST {{baseUrl}}/api/v1/auth/login
 Content-Type: application/json
@@ -24,7 +34,7 @@ Content-Type: application/json
   "password": "password123"
 }
 
-### 3. Save token from login response
+### 3. Login (get token) from login response
 @token = {{login.response.body.token}}
 
 ### 4. Get all users WITHOUT token (should return 401 Unauthorized)
