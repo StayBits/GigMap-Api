@@ -43,6 +43,12 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.username = username;
     }
     
+    public User(String email, String username, String passwordHash) {
+        this.email = email;
+        this.username = username;
+        this.passwordHash = passwordHash;
+    }
+    
     public User(String email, String username, Artist artist) {
         this(email, username);
         this.artist = artist;
