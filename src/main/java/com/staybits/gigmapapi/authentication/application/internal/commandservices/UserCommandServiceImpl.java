@@ -31,7 +31,15 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new IllegalArgumentException("User with id %s not found".formatted(command.userId()));
         var userToUpdate = result.get();
         try {
-            var updatedUser = userRepository.save(userToUpdate.updateInformation(command.email(), command.username()));
+            var updatedUser = userRepository.save(userToUpdate.updateInformation(
+                command.email(),
+        command.username(),
+        command.name(),
+        command.role(),
+        command.imagenUrl(),
+        command.descripcion(),
+        command.bannerUrl()
+            ));
             return Optional.of(updatedUser);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error while updating user: %s".formatted(e.getMessage()));

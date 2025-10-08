@@ -4,7 +4,8 @@ public record AuthResponse(
     Long id,
     String email,
     String username,
-    boolean isArtist,
+    String name,
+    String role,
     String token,
     String message
 ) {}
