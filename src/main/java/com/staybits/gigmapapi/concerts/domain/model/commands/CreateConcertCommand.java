@@ -5,11 +5,12 @@ import com.staybits.gigmapapi.concerts.domain.model.entities.Venue;
 import com.staybits.gigmapapi.concerts.domain.model.valueobjects.ConcertStatus;
 import com.staybits.gigmapapi.concerts.domain.model.valueobjects.Genre;
 
-import java.sql.Date;
+
+import java.time.LocalDateTime;
 
 public record CreateConcertCommand(
     String title,
-    Date datehour,
+    LocalDateTime datehour,
     String description,
     String imageUrl,
     Venue venue,

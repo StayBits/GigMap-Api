@@ -2,7 +2,6 @@ package com.staybits.gigmapapi.concerts.interfaces.rest.transform;
 
 import com.staybits.gigmapapi.concerts.domain.model.commands.UpdateConcertCommand;
 import com.staybits.gigmapapi.concerts.domain.model.valueobjects.ConcertStatus;
-import com.staybits.gigmapapi.concerts.domain.model.valueobjects.Genre;
 import com.staybits.gigmapapi.concerts.interfaces.rest.resources.UpdateConcertResource;
 
 public class UpdateConcertCommandFromResourceAssembler {
@@ -17,9 +16,7 @@ public class UpdateConcertCommandFromResourceAssembler {
             resource.description(),
             resource.imageUrl(),
             VenueAssembler.toEntityFromResource(resource.venue()),
-            ConcertStatus.valueOf(resource.status()),
-            Genre.valueOf(resource.genre()),
-            PlatformAssembler.toEntityFromResource(resource.platform())
+            ConcertStatus.valueOf(resource.status())
         );
     }
 }

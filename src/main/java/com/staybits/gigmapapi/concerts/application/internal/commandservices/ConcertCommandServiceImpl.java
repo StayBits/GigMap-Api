@@ -2,11 +2,15 @@ package com.staybits.gigmapapi.concerts.application.internal.commandservices;
 
 import com.staybits.gigmapapi.authentication.infrastructure.persistence.jpa.repositories.UserRepository;
 import com.staybits.gigmapapi.concerts.domain.model.aggregates.Concert;
+import com.staybits.gigmapapi.concerts.domain.model.commands.AddAttendeeCommand;
 import com.staybits.gigmapapi.concerts.domain.model.commands.CreateConcertCommand;
 import com.staybits.gigmapapi.concerts.domain.model.commands.DeleteConcertCommand;
+import com.staybits.gigmapapi.concerts.domain.model.commands.RemoveAttendeeCommand;
 import com.staybits.gigmapapi.concerts.domain.model.commands.UpdateConcertCommand;
 import com.staybits.gigmapapi.concerts.domain.services.ConcertCommandService;
 import com.staybits.gigmapapi.concerts.infrastructure.persistence.jpa.repositories.ConcertRepository;
+import com.staybits.gigmapapi.concerts.infrastructure.persistence.jpa.repositories.PlatformRepository;
+import com.staybits.gigmapapi.concerts.infrastructure.persistence.jpa.repositories.VenueRepository;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,10 +24,15 @@ public class ConcertCommandServiceImpl implements ConcertCommandService {
 
     private final ConcertRepository concertRepository;
     private final UserRepository userRepository;
+    private final VenueRepository venueRepository;
+    private final PlatformRepository platformRepository;
 
-    public ConcertCommandServiceImpl(ConcertRepository concertRepository, UserRepository userRepository) {
+    public ConcertCommandServiceImpl(ConcertRepository concertRepository, UserRepository userRepository, 
+                                     VenueRepository venueRepository, PlatformRepository platformRepository) {
         this.concertRepository = concertRepository;
         this.userRepository = userRepository;
+        this.venueRepository = venueRepository;
+        this.platformRepository = platformRepository;
     }
 
     @Override
@@ -31,16 +40,24 @@ public class ConcertCommandServiceImpl implements ConcertCommandService {
         var user = userRepository.findById(command.userId())
                 .orElseThrow(() -> new IllegalArgumentException("User with id %s not found".formatted(command.userId())));
 
+        // Find Venue by name or create new one
+        var venue = venueRepository.findByName(command.venue().getName())
+                .orElseGet(() -> venueRepository.save(command.venue()));
+
+        // Find Platform by name or create new one
+        var platform = platformRepository.findByName(command.platform().getName())
+                .orElseGet(() -> platformRepository.save(command.platform()));
+
         var concert = new Concert(
                 command.title(),
                 command.datehour(),
                 command.description(),
                 command.imageUrl(),
-                command.venue(),
+                venue,
                 command.status(),
                 user,
                 command.genre(),
-                command.platform()
+                platform
         );
 
         // Validate that the user is an artist
@@ -59,15 +76,17 @@ public class ConcertCommandServiceImpl implements ConcertCommandService {
             return null;
         }
 
+        // Find Venue by name or create new one
+        var venue = venueRepository.findByName(command.venue().getName())
+                .orElseGet(() -> venueRepository.save(command.venue()));
+
         var concert = existingConcert.get();
         concert.setTitle(command.title());
         concert.setDatehour(command.datehour());
         concert.setDescription(command.description());
         concert.setImageUrl(command.imageUrl());
-        concert.setVenue(command.venue());
+        concert.setVenue(venue);
         concert.setStatus(command.status());
-        concert.setGenre(command.genre());
-        concert.setPlatform(command.platform());
 
         return concertRepository.save(concert);
     }
@@ -82,5 +101,29 @@ public class ConcertCommandServiceImpl implements ConcertCommandService {
 
         concertRepository.delete(concert.get());
         return true;
+    }
+
+    @Override
+    public Concert handle(AddAttendeeCommand command) {
+        var concert = concertRepository.findById(command.concertId())
+                .orElseThrow(() -> new IllegalArgumentException("Concert with id %s not found".formatted(command.concertId())));
+        
+        var user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new IllegalArgumentException("User with id %s not found".formatted(command.userId())));
+        
+        concert.getAttendees().add(user);
+        return concertRepository.save(concert);
+    }
+
+    @Override
+    public Concert handle(RemoveAttendeeCommand command) {
+        var concert = concertRepository.findById(command.concertId())
+                .orElseThrow(() -> new IllegalArgumentException("Concert with id %s not found".formatted(command.concertId())));
+        
+        var user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new IllegalArgumentException("User with id %s not found".formatted(command.userId())));
+        
+        concert.getAttendees().remove(user);
+        return concertRepository.save(concert);
     }
 }

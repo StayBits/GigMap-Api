@@ -10,9 +10,7 @@ public record UpdateConcertResource(
     String imageUrl,
     LocalDateTime date,
     VenueResource venue,
-    String genre,
-    String status,
-    PlatformResource platform
+    String status
 ) {
     public UpdateConcertResource {
         if (id == null || id <= 0) {
@@ -32,9 +30,6 @@ public record UpdateConcertResource(
         }
         if (venue == null || venue.name() == null || venue.name().isBlank() || venue.address() == null || venue.address().isBlank()) {
             throw new IllegalArgumentException("venue cannot be null and must have name and address");
-        }
-        if (genre == null || genre.isBlank()) {
-            throw new IllegalArgumentException("genre cannot be null or blank");
         }
         if (status == null || status.isBlank()) {
             throw new IllegalArgumentException("status cannot be null or blank");

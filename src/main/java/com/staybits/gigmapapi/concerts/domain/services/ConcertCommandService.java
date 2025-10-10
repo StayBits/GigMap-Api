@@ -4,6 +4,8 @@ import com.staybits.gigmapapi.concerts.domain.model.aggregates.Concert;
 import com.staybits.gigmapapi.concerts.domain.model.commands.CreateConcertCommand;
 import com.staybits.gigmapapi.concerts.domain.model.commands.UpdateConcertCommand;
 import com.staybits.gigmapapi.concerts.domain.model.commands.DeleteConcertCommand;
+import com.staybits.gigmapapi.concerts.domain.model.commands.AddAttendeeCommand;
+import com.staybits.gigmapapi.concerts.domain.model.commands.RemoveAttendeeCommand;
 
 /**
  * Concert command service
@@ -32,4 +34,18 @@ public interface ConcertCommandService {
      * @return true if deleted successfully, false otherwise
      */
     boolean handle(DeleteConcertCommand command);
+
+    /**
+     * Handle add attendee command
+     * @param command the {@link AddAttendeeCommand} command
+     * @return the updated {@link Concert} entity
+     */
+    Concert handle(AddAttendeeCommand command);
+
+    /**
+     * Handle remove attendee command
+     * @param command the {@link RemoveAttendeeCommand} command
+     * @return the updated {@link Concert} entity
+     */
+    Concert handle(RemoveAttendeeCommand command);
 }

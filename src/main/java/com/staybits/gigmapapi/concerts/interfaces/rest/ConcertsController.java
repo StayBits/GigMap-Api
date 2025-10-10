@@ -3,13 +3,19 @@ package com.staybits.gigmapapi.concerts.interfaces.rest;
 import com.staybits.gigmapapi.concerts.domain.model.commands.DeleteConcertCommand;
 import com.staybits.gigmapapi.concerts.domain.model.queries.GetAllConcertsQuery;
 import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertByIdQuery;
+import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertsByGenreQuery;
+import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertsByArtistQuery;
+import com.staybits.gigmapapi.concerts.domain.model.valueobjects.Genre;
 import com.staybits.gigmapapi.concerts.domain.services.ConcertCommandService;
 import com.staybits.gigmapapi.concerts.domain.services.ConcertQueryService;
+import com.staybits.gigmapapi.concerts.interfaces.rest.resources.AttendeeResource;
 import com.staybits.gigmapapi.concerts.interfaces.rest.resources.ConcertResource;
 import com.staybits.gigmapapi.concerts.interfaces.rest.resources.CreateConcertResource;
 import com.staybits.gigmapapi.concerts.interfaces.rest.resources.UpdateConcertResource;
+import com.staybits.gigmapapi.concerts.interfaces.rest.transform.AddAttendeeCommandFromResourceAssembler;
 import com.staybits.gigmapapi.concerts.interfaces.rest.transform.ConcertResourceFromEntityAssembler;
 import com.staybits.gigmapapi.concerts.interfaces.rest.transform.CreateConcertCommandFromResourceAssembler;
+import com.staybits.gigmapapi.concerts.interfaces.rest.transform.RemoveAttendeeCommandFromResourceAssembler;
 import com.staybits.gigmapapi.concerts.interfaces.rest.transform.UpdateConcertCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -123,14 +129,80 @@ public class ConcertsController {
         return ResponseEntity.ok("Concert with given id successfully deleted");
     }
 
-    @GetMapping("/{concertId}/attendees")
-    @Operation(summary = "Check if user is attending the concert", description = "Returns true if the given user is attending the specified concert")
+    @GetMapping("/genre/{genre}")
+    @Operation(summary = "Get concerts by genre", description = "Retrieve concerts filtered by genre")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User attendance status retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Concert not found")
+            @ApiResponse(responseCode = "200", description = "Concerts found"),
+            @ApiResponse(responseCode = "404", description = "No concerts found")
     })
-    public ResponseEntity<Boolean> isUserAttendingConcert(@PathVariable Long concertId, @RequestParam Long userId) {
-        Boolean isAttending = concertQueryService.checkAttendance(concertId, userId);
-        return ResponseEntity.ok(isAttending);
+    public ResponseEntity<List<ConcertResource>> getConcertsByGenre(@PathVariable String genre) {
+        try {
+            var genreEnum = Genre.valueOf(genre.toUpperCase());
+            var concerts = concertQueryService.handle(new GetConcertsByGenreQuery(genreEnum));
+            
+            if (concerts.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            var concertResources = ConcertResourceFromEntityAssembler.toResourcesFromEntities(concerts);
+            return ResponseEntity.ok(concertResources);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/artist/{artistId}")
+    @Operation(summary = "Get concerts by artist", description = "Retrieve concerts created by a specific artist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Concerts found"),
+            @ApiResponse(responseCode = "404", description = "No concerts found")
+    })
+    public ResponseEntity<List<ConcertResource>> getConcertsByArtist(@PathVariable Long artistId) {
+        var concerts = concertQueryService.handle(new GetConcertsByArtistQuery(artistId));
+        
+        if (concerts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        var concertResources = ConcertResourceFromEntityAssembler.toResourcesFromEntities(concerts);
+        return ResponseEntity.ok(concertResources);
+    }
+
+    @PostMapping("/attendees")
+    @Operation(summary = "Add attendee to concert", description = "Confirms a user's attendance to a concert")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Attendee added successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Concert or user not found")
+    })
+    public ResponseEntity<ConcertResource> addAttendee(@RequestBody AttendeeResource resource) {
+        var command = AddAttendeeCommandFromResourceAssembler.toCommandFromResource(resource);
+        var concert = concertCommandService.handle(command);
+        
+        if (concert == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        var concertResource = ConcertResourceFromEntityAssembler.toResourceFromEntity(concert);
+        return ResponseEntity.ok(concertResource);
+    }
+
+    @DeleteMapping("/attendees")
+    @Operation(summary = "Remove attendee from concert", description = "Removes a user's attendance from a concert")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Attendee removed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Concert or user not found")
+    })
+    public ResponseEntity<ConcertResource> removeAttendee(@RequestBody AttendeeResource resource) {
+        var command = RemoveAttendeeCommandFromResourceAssembler.toCommandFromResource(resource);
+        var concert = concertCommandService.handle(command);
+        
+        if (concert == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        var concertResource = ConcertResourceFromEntityAssembler.toResourceFromEntity(concert);
+        return ResponseEntity.ok(concertResource);
     }
 }

@@ -3,6 +3,8 @@ package com.staybits.gigmapapi.concerts.application.internal.queryservices;
 import com.staybits.gigmapapi.concerts.domain.model.aggregates.Concert;
 import com.staybits.gigmapapi.concerts.domain.model.queries.GetAllConcertsQuery;
 import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertByIdQuery;
+import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertsByGenreQuery;
+import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertsByArtistQuery;
 import com.staybits.gigmapapi.concerts.domain.services.ConcertQueryService;
 import com.staybits.gigmapapi.concerts.infrastructure.persistence.jpa.repositories.ConcertRepository;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,12 @@ public class ConcertQueryServiceImpl implements ConcertQueryService {
     }
 
     @Override
-    public Boolean checkAttendance(Long concertId, Long userId) {
-        return concertRepository.existsUserInConcert(concertId, userId);
+    public List<Concert> handle(GetConcertsByGenreQuery query) {
+        return concertRepository.findByGenre(query.genre());
+    }
+
+    @Override
+    public List<Concert> handle(GetConcertsByArtistQuery query) {
+        return concertRepository.findByUserId(query.artistId());
     }
 }

@@ -38,5 +38,8 @@ public record CreateConcertResource(
         if (userId == null || userId <= 0) {
             throw new IllegalArgumentException("userId must be greater than 0");
         }
+        if (platform == null || platform.platformName() == null || platform.platformName().isBlank()) {
+            throw new IllegalArgumentException("platform cannot be null and must have platformName");
+        }
     }
 }
