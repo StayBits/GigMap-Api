@@ -12,8 +12,7 @@ public class UserDetailsResourceFromEntityAssembler {
             entity.getUsername(),
             entity.getRole().name(),
             entity.getImagenUrl(),
-            entity.getDescripcion(),
-            entity.getBannerUrl()
+            entity.getDescripcion()
         );
     }
 }

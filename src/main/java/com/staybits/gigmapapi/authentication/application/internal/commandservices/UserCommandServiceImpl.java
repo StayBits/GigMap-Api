@@ -37,8 +37,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         command.name(),
         command.role(),
         command.imagenUrl(),
-        command.descripcion(),
-        command.bannerUrl()
+        command.descripcion()
+      
             ));
             return Optional.of(updatedUser);
         } catch (Exception e) {

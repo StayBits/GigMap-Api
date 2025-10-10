@@ -13,8 +13,7 @@ public class UpdateUserCommandFromResourceAssembler {
             resource.name(),
             resource.role() != null ? Role.valueOf(resource.role()) : null,
             resource.imagenUrl(),
-            resource.descripcion(),
-            resource.bannerUrl()
+            resource.descripcion()
         );
     }
 }

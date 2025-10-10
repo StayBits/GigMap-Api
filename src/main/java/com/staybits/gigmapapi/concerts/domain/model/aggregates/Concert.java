@@ -2,6 +2,8 @@ package com.staybits.gigmapapi.concerts.domain.model.aggregates;
 
 import com.staybits.gigmapapi.authentication.domain.model.aggregates.User;
 import com.staybits.gigmapapi.authentication.domain.model.valueobjects.Role;
+import com.staybits.gigmapapi.concerts.domain.model.entities.Platform;
+import com.staybits.gigmapapi.concerts.domain.model.entities.Venue;
 import com.staybits.gigmapapi.concerts.domain.model.valueobjects.ConcertStatus;
 import com.staybits.gigmapapi.concerts.domain.model.valueobjects.Genre;
 import com.staybits.gigmapapi.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
@@ -30,6 +32,13 @@ public class Concert extends AuditableAbstractAggregateRoot<Concert> {
     @Column(nullable = false)
     private Date datehour;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Size(max = 500)
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "venue_id", nullable = false)
@@ -50,6 +59,10 @@ public class Concert extends AuditableAbstractAggregateRoot<Concert> {
     @Column(nullable = false)
     private Genre genre;
 
+    @ManyToOne
+    @JoinColumn(name = "platform_id")
+    private Platform platform;
+
     @ManyToMany
     @JoinTable(
         name = "concert_attendees",
@@ -62,13 +75,16 @@ public class Concert extends AuditableAbstractAggregateRoot<Concert> {
         super();
     }
 
-    public Concert(String title, Date datehour, Venue venue, ConcertStatus status, User user, Genre genre) {
+    public Concert(String title, Date datehour, String description, String imageUrl, Venue venue, ConcertStatus status, User user, Genre genre, Platform platform) {
         this.title = title;
         this.datehour = datehour;
+        this.description = description;
+        this.imageUrl = imageUrl;
         this.venue = venue;
         this.status = status;
         this.user = user;
         this.genre = genre;
+        this.platform = platform;
         this.attendees = new HashSet<>();
     }
 

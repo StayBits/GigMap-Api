@@ -48,9 +48,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
     
-    @Size(max = 500)
-    @Column(name = "banner_url")
-    private String bannerUrl;
+    
     
     public User() {
     }
@@ -77,14 +75,13 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         return this;
     }
     
-    public User updateInformation(String email, String username, String name, Role role, String imagenUrl, String descripcion, String bannerUrl) {
+    public User updateInformation(String email, String username, String name, Role role, String imagenUrl, String descripcion) {
         this.email = email;
         this.username = username;
         this.name = name;
         this.role = role;
         this.imagenUrl = imagenUrl;
         this.descripcion = descripcion;
-        this.bannerUrl = bannerUrl;
         return this;
     }
 }

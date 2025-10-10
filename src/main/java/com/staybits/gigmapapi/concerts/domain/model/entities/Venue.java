@@ -1,6 +1,6 @@
-package com.staybits.gigmapapi.concerts.domain.model.aggregates;
+package com.staybits.gigmapapi.concerts.domain.model.entities;
 
-import com.staybits.gigmapapi.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.staybits.gigmapapi.shared.domain.model.entities.AuditableModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.DecimalMin;
@@ -13,7 +13,11 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @Table(name = "venues")
-public class Venue extends AuditableAbstractAggregateRoot<Venue> {
+public class Venue extends AuditableModel {
+    
+    @NotNull
+    @Column(nullable = false, length = 200)
+    private String name;
     
     @NotNull
     @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")
@@ -36,10 +40,10 @@ public class Venue extends AuditableAbstractAggregateRoot<Venue> {
     private Integer capacidad;
     
     public Venue() {
-        super();
     }
     
-    public Venue(BigDecimal latitud, BigDecimal longitud, String direccion, Integer capacidad) {
+    public Venue(String name, BigDecimal latitud, BigDecimal longitud, String direccion, Integer capacidad) {
+        this.name = name;
         this.latitud = latitud;
         this.longitud = longitud;
         this.direccion = direccion;
