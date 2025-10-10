@@ -1,4 +1,4 @@
-package com.staybits.gigmapapi.concerts.domain.model.valueobjects;
+package com.staybits.gigmapapi.concerts.domain.model.aggregates;
 
 import com.staybits.gigmapapi.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;

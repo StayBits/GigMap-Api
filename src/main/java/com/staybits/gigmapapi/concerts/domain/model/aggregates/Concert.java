@@ -4,7 +4,6 @@ import com.staybits.gigmapapi.authentication.domain.model.aggregates.User;
 import com.staybits.gigmapapi.authentication.domain.model.valueobjects.Role;
 import com.staybits.gigmapapi.concerts.domain.model.valueobjects.ConcertStatus;
 import com.staybits.gigmapapi.concerts.domain.model.valueobjects.Genre;
-import com.staybits.gigmapapi.concerts.domain.model.valueobjects.Venue;
 import com.staybits.gigmapapi.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
