@@ -13,7 +13,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,7 +30,7 @@ public class Concert extends AuditableAbstractAggregateRoot<Concert> {
 
     @NotNull
     @Column(nullable = false)
-    private Date datehour;
+    private LocalDateTime datehour;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -75,7 +75,7 @@ public class Concert extends AuditableAbstractAggregateRoot<Concert> {
         super();
     }
 
-    public Concert(String title, Date datehour, String description, String imageUrl, Venue venue, ConcertStatus status, User user, Genre genre, Platform platform) {
+    public Concert(String title, LocalDateTime datehour, String description, String imageUrl, Venue venue, ConcertStatus status, User user, Genre genre, Platform platform) {
         this.title = title;
         this.datehour = datehour;
         this.description = description;

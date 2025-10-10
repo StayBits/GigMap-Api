@@ -1,12 +1,12 @@
 package com.staybits.gigmapapi.concerts.interfaces.rest.resources;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 public record CreateConcertResource(
     String title,
     String description,
     String imageUrl,
-    Date date,
+    LocalDateTime date,
     VenueResource venue,
     String genre,
     String status,
