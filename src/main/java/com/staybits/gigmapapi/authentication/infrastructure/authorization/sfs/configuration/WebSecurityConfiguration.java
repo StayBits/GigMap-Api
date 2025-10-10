@@ -47,7 +47,7 @@ public class WebSecurityConfiguration {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints (authentication)
-                .requestMatchers("/api/v1/***").permitAll()
+                .requestMatchers("/api/v1/**").permitAll()
                 // Swagger/OpenAPI endpoints
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 // All other endpoints require authentication
