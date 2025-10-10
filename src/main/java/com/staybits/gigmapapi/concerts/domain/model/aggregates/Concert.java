@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -48,6 +50,14 @@ public class Concert extends AuditableAbstractAggregateRoot<Concert> {
     @Column(nullable = false)
     private Genre genre;
 
+    @ManyToMany
+    @JoinTable(
+        name = "concert_attendees",
+        joinColumns = @JoinColumn(name = "concert_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> attendees = new HashSet<>();
+
     public Concert() {
         super();
     }
@@ -59,6 +69,7 @@ public class Concert extends AuditableAbstractAggregateRoot<Concert> {
         this.status = status;
         this.user = user;
         this.genre = genre;
+        this.attendees = new HashSet<>();
     }
 
     /**

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.DecimalMax;
 import lombok.Getter;
 import lombok.Setter;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -18,13 +19,13 @@ public class Venue extends AuditableAbstractAggregateRoot<Venue> {
     @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")
     @DecimalMax(value = "90.0", message = "Latitude must be between -90 and 90")
     @Column(nullable = false, precision = 10, scale = 8)
-    private Double latitud;
+    private BigDecimal latitud;
     
     @NotNull
     @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180")
     @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
     @Column(nullable = false, precision = 11, scale = 8)
-    private Double longitud;
+    private BigDecimal longitud;
     
     @NotNull
     @Column(nullable = false, length = 500)
@@ -38,7 +39,7 @@ public class Venue extends AuditableAbstractAggregateRoot<Venue> {
         super();
     }
     
-    public Venue(Double latitud, Double longitud, String direccion, Integer capacidad) {
+    public Venue(BigDecimal latitud, BigDecimal longitud, String direccion, Integer capacidad) {
         this.latitud = latitud;
         this.longitud = longitud;
         this.direccion = direccion;
