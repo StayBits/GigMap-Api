@@ -2,18 +2,27 @@ FROM maven:3.8.5-openjdk-17 AS build
 
 WORKDIR /app
 
-COPY pom.xml /
+# Copia el POM al directorio de trabajo
+COPY pom.xml .
+
+# Descarga dependencias sin compilar código
 RUN mvn dependency:go-offline
 
+# Copia el código fuente
 COPY src ./src
+
+# Compila el proyecto (sin ejecutar tests)
 RUN mvn clean package -DskipTests
 
-RUN ls -la /app/target
+# Verifica que el jar esté en target
+RUN ls -la target
 
+# Imagen final
 FROM openjdk:17-jdk-alpine
 
 WORKDIR /app
 
+# Copia el jar desde la imagen de compilación
 COPY --from=build /app/target/GigMap-api-0.0.1-SNAPSHOT.jar /app/GigMap-api.jar
 
 EXPOSE 8080
