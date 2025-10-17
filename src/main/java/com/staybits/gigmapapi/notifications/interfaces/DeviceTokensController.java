@@ -16,9 +16,11 @@ import com.staybits.gigmapapi.notifications.interfaces.transformers.DeviceTokenR
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import org.springframework.http.HttpStatus;
+
 @RestController
 @RequestMapping(value = "/api/v1/device_tokens", produces = APPLICATION_JSON_VALUE)
-@Tag(name = "Concerts", description = "Operations related to Device Tokens")
+@Tag(name = "Device Tokens", description = "Operations related to Device Tokens")
 public class DeviceTokensController {
 
     private final DeviceTokenCommandService deviceTokenCommandService;
@@ -27,14 +29,14 @@ public class DeviceTokensController {
         this.deviceTokenCommandService = deviceTokenCommandService;
     }
 
+    @PostMapping
     @Operation(
-        summary = "Registrar o actualizar token de dispositivo",
-        description = "Recibe un token FCM junto con el ID del usuario y lo almacena en el sistema. Si el token ya existe, se ignora.",
+        summary = "Create a new Device Token",
+        description = "Create a new Device Token",
         responses = {
-            @ApiResponse(responseCode = "200", description = "Token registrado exitosamente")
+            @ApiResponse(responseCode = "201", description = "Device Token created successfully")
         }
     )
-    @PostMapping
     public ResponseEntity<DeviceTokenResource> createDeviceToken(@RequestBody CreateDeviceTokenResource resource) {
         CreateDeviceTokenCommand command = CreateDeviceTokenCommandFromResourceAssembler.toCommandFromResource(resource);
         DeviceToken deviceToken = deviceTokenCommandService.handle(command);
@@ -43,6 +45,6 @@ public class DeviceTokensController {
             return ResponseEntity.badRequest().build();
 
         DeviceTokenResource response = DeviceTokenResourceFromEntityAssembler.toResourceFromEntity(deviceToken);
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
