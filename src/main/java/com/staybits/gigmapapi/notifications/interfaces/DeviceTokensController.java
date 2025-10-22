@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 @RequestMapping(value = "/api/v1/device_tokens", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Device Tokens", description = "Operations related to Device Tokens")
 public class DeviceTokensController {
-
     private final DeviceTokenCommandService deviceTokenCommandService;
 
     public DeviceTokensController(DeviceTokenCommandService deviceTokenCommandService) {

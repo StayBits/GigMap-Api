@@ -11,5 +11,5 @@ import com.staybits.gigmapapi.notifications.domain.model.aggregates.DeviceToken;
 public interface DeviceTokenRepository extends JpaRepository<DeviceToken, Long> {
     Optional<DeviceToken> findByToken(String token);
 
-    Optional<DeviceToken> findByUserId(Long userId);
+    Optional<DeviceToken> findAllByUserId(Long userId);
 }
