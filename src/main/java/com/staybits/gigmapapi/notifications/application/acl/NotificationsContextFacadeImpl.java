@@ -33,8 +33,8 @@ public class NotificationsContextFacadeImpl implements NotificationsContextFacad
     }
 
     @Override
-    public void notifyAllUsersOfNewPost(Long postId, String postContent, String communityName) {
-        String title = "Nuevo post en " + communityName;
+    public void notifyAllUsersOfNewPost(Long postId, String postContent, String communityName, String username) {
+        String title = username + " en " + communityName;
         String body = postContent.length() > 100 ? postContent.substring(0, 100) + "..." : postContent;
 
         Notification newNotification = new Notification(title, body);
