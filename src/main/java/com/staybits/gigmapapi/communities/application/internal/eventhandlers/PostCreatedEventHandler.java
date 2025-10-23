@@ -16,6 +16,6 @@ public class PostCreatedEventHandler {
 
     @EventListener(PostCreatedEvent.class)
     public void handle(PostCreatedEvent event) {
-        this.notificationsContextFacade.notifyAllUsersOfNewPost(event.getPostId(), event.getPostContent(), event.getCommunityName());
+        this.notificationsContextFacade.notifyAllUsersOfNewPost(event.getPostId(), event.getPostContent(), event.getCommunityName(), event.getUsername());
     }
 }
