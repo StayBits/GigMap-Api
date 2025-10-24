@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.staybits.gigmapapi.communities.domain.model.aggregates.Post;
 import com.staybits.gigmapapi.communities.domain.model.commands.LikePostCommand;
 import com.staybits.gigmapapi.communities.domain.model.commands.UnlikePostCommand;
+import com.staybits.gigmapapi.communities.domain.model.queries.GetAllLikedPostsByUserIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetPostByIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetPostsByCommunityIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetPostsQuery;
@@ -138,5 +139,27 @@ public class PostsController {
     public ResponseEntity<Void> unlikePost(@PathVariable Long postId, @RequestParam Long userId) {
         postCommandService.handle(new UnlikePostCommand(postId, userId));
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/liked_by/{userId}")
+    @Operation(
+        summary = "Get all posts liked by a User",
+        description = "Get all posts liked by a User"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Liked posts retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "No liked posts found for the given User")
+    })
+    public ResponseEntity<List<PostResource>> getAllLikedPostsByUserId(@PathVariable Long userId) {
+        var likedPosts = this.postQueryService.handle(new GetAllLikedPostsByUserIdQuery(userId));
+
+        if (likedPosts.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        var likedPostsResources = likedPosts.stream()
+                .map(PostResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(likedPostsResources);
     }
 }

@@ -11,4 +11,6 @@ import com.staybits.gigmapapi.communities.domain.model.aggregates.Post;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByCommunity(Community community);
+
+    List<Post> findByLikedBy_Id(Long userId);
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.staybits.gigmapapi.communities.domain.model.aggregates.Community;
 import com.staybits.gigmapapi.communities.domain.model.aggregates.Post;
+import com.staybits.gigmapapi.communities.domain.model.queries.GetAllLikedPostsByUserIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetPostByIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetPostsByCommunityIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetPostsQuery;
@@ -40,5 +41,10 @@ public class PostQueryServiceImpl implements PostQueryService {
             .orElseThrow(() -> new RuntimeException("Community not found"));
 
         return postRepository.findAllByCommunity(community);
+    }
+
+    @Override
+    public List<Post> handle(GetAllLikedPostsByUserIdQuery query) {
+        return this.postRepository.findByLikedBy_Id(query.userId());
     }
 }
