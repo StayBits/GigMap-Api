@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.staybits.gigmapapi.communities.domain.model.aggregates.Post;
+import com.staybits.gigmapapi.communities.domain.model.commands.DeletePostCommand;
 import com.staybits.gigmapapi.communities.domain.model.commands.LikePostCommand;
 import com.staybits.gigmapapi.communities.domain.model.commands.UnlikePostCommand;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetAllLikedPostsByUserIdQuery;
@@ -81,6 +82,21 @@ public class PostsController {
 
         var postResource = PostResourceFromEntityAssembler.toResourceFromEntity(updatedPost.get());
         return ResponseEntity.ok(postResource);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a Post", description = "Deletes an existing Post with the given ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Post not found")
+    })
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        if (this.postQueryService.handle(new GetPostByIdQuery(id)).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        this.postCommandService.handle(new DeletePostCommand(id));
+        return ResponseEntity.ok().build();
     }
     
     @GetMapping
