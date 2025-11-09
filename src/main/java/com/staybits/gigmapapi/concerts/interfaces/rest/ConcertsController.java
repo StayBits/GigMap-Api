@@ -1,6 +1,7 @@
 package com.staybits.gigmapapi.concerts.interfaces.rest;
 
 import com.staybits.gigmapapi.concerts.domain.model.commands.DeleteConcertCommand;
+import com.staybits.gigmapapi.concerts.domain.model.queries.GetAllConcertsAttendedByUserIdQuery;
 import com.staybits.gigmapapi.concerts.domain.model.queries.GetAllConcertsQuery;
 import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertByIdQuery;
 import com.staybits.gigmapapi.concerts.domain.model.queries.GetConcertsByGenreQuery;
@@ -33,7 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/api/v1/concerts", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Concerts", description = "Operations related to Concerts")
 public class ConcertsController {
-    
+
     private final ConcertCommandService concertCommandService;
     private final ConcertQueryService concertQueryService;
 
@@ -51,11 +52,11 @@ public class ConcertsController {
     public ResponseEntity<ConcertResource> createConcert(@RequestBody CreateConcertResource resource) {
         var command = CreateConcertCommandFromResourceAssembler.toCommandFromResource(resource);
         var concert = concertCommandService.handle(command);
-        
+
         if (concert == null || concert.getId() == null || concert.getId() <= 0) {
             return ResponseEntity.badRequest().build();
         }
-        
+
         var concertResponse = ConcertResourceFromEntityAssembler.toResourceFromEntity(concert);
         return new ResponseEntity<>(concertResponse, HttpStatus.CREATED);
     }
@@ -68,11 +69,11 @@ public class ConcertsController {
     })
     public ResponseEntity<List<ConcertResource>> getAllConcerts() {
         var concerts = concertQueryService.handle(new GetAllConcertsQuery());
-        
+
         if (concerts.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        
+
         var concertResources = ConcertResourceFromEntityAssembler.toResourcesFromEntities(concerts);
         return ResponseEntity.ok(concertResources);
     }
@@ -85,11 +86,11 @@ public class ConcertsController {
     })
     public ResponseEntity<ConcertResource> getConcertById(@PathVariable Long concertId) {
         var concert = concertQueryService.handle(new GetConcertByIdQuery(concertId));
-        
+
         if (concert.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        
+
         var concertResource = ConcertResourceFromEntityAssembler.toResourceFromEntity(concert.get());
         return ResponseEntity.ok(concertResource);
     }
@@ -100,14 +101,15 @@ public class ConcertsController {
             @ApiResponse(responseCode = "200", description = "Concert updated successfully"),
             @ApiResponse(responseCode = "404", description = "Concert not found")
     })
-    public ResponseEntity<ConcertResource> updateConcert(@PathVariable Long concertId, @RequestBody UpdateConcertResource resource) {
+    public ResponseEntity<ConcertResource> updateConcert(@PathVariable Long concertId,
+            @RequestBody UpdateConcertResource resource) {
         var command = UpdateConcertCommandFromResourceAssembler.toCommandFromResource(resource);
         var concert = concertCommandService.handle(command);
-        
+
         if (concert == null) {
             return ResponseEntity.notFound().build();
         }
-        
+
         var concertResource = ConcertResourceFromEntityAssembler.toResourceFromEntity(concert);
         return ResponseEntity.ok(concertResource);
     }
@@ -121,11 +123,11 @@ public class ConcertsController {
     public ResponseEntity<String> deleteConcert(@PathVariable Long concertId) {
         var command = new DeleteConcertCommand(concertId);
         boolean deleted = concertCommandService.handle(command);
-        
+
         if (!deleted) {
             return ResponseEntity.notFound().build();
         }
-        
+
         return ResponseEntity.ok("Concert with given id successfully deleted");
     }
 
@@ -139,11 +141,11 @@ public class ConcertsController {
         try {
             var genreEnum = Genre.valueOf(genre.toUpperCase());
             var concerts = concertQueryService.handle(new GetConcertsByGenreQuery(genreEnum));
-            
+
             if (concerts.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            
+
             var concertResources = ConcertResourceFromEntityAssembler.toResourcesFromEntities(concerts);
             return ResponseEntity.ok(concertResources);
         } catch (IllegalArgumentException e) {
@@ -159,11 +161,11 @@ public class ConcertsController {
     })
     public ResponseEntity<List<ConcertResource>> getConcertsByArtist(@PathVariable Long artistId) {
         var concerts = concertQueryService.handle(new GetConcertsByArtistQuery(artistId));
-        
+
         if (concerts.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        
+
         var concertResources = ConcertResourceFromEntityAssembler.toResourcesFromEntities(concerts);
         return ResponseEntity.ok(concertResources);
     }
@@ -178,11 +180,11 @@ public class ConcertsController {
     public ResponseEntity<ConcertResource> addAttendee(@RequestBody AttendeeResource resource) {
         var command = AddAttendeeCommandFromResourceAssembler.toCommandFromResource(resource);
         var concert = concertCommandService.handle(command);
-        
+
         if (concert == null) {
             return ResponseEntity.notFound().build();
         }
-        
+
         var concertResource = ConcertResourceFromEntityAssembler.toResourceFromEntity(concert);
         return ResponseEntity.ok(concertResource);
     }
@@ -197,12 +199,31 @@ public class ConcertsController {
     public ResponseEntity<ConcertResource> removeAttendee(@RequestBody AttendeeResource resource) {
         var command = RemoveAttendeeCommandFromResourceAssembler.toCommandFromResource(resource);
         var concert = concertCommandService.handle(command);
-        
+
         if (concert == null) {
             return ResponseEntity.notFound().build();
         }
-        
+
         var concertResource = ConcertResourceFromEntityAssembler.toResourceFromEntity(concert);
         return ResponseEntity.ok(concertResource);
+    }
+
+    @GetMapping("/attended/{userId}")
+    @Operation(summary = "Get all concerts attended by a User", description = "Get all concerts attended by a User")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Concerts attended retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No concerts attended found for the given User")
+    })
+    public ResponseEntity<List<ConcertResource>> getAllConcertsAttendedByUserId(@PathVariable Long userId) {
+        var concertsAttended = this.concertQueryService.handle(new GetAllConcertsAttendedByUserIdQuery(userId));
+
+        if (concertsAttended.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        var concertsAttendedResources = concertsAttended.stream()
+                .map(ConcertResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(concertsAttendedResources);
     }
 }
