@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.staybits.gigmapapi.communities.domain.model.commands.DeleteCommunityCommand;
 import com.staybits.gigmapapi.communities.domain.model.commands.JoinCommunityCommand;
 import com.staybits.gigmapapi.communities.domain.model.commands.LeaveCommunityCommand;
+import com.staybits.gigmapapi.communities.domain.model.queries.GetAllCommunitiesJoinedByUserIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetCommunitiesQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetCommunityByIdQuery;
 import com.staybits.gigmapapi.communities.domain.services.CommunityCommandService;
@@ -33,19 +34,21 @@ public class CommunitiesController {
     private final CommunityCommandService communityCommandService;
     private final CommunityQueryService communityQueryService;
 
-    public CommunitiesController(CommunityCommandService communityCommandService, CommunityQueryService communityQueryService) {
+    public CommunitiesController(CommunityCommandService communityCommandService,
+            CommunityQueryService communityQueryService) {
         this.communityCommandService = communityCommandService;
         this.communityQueryService = communityQueryService;
     }
 
     @PostMapping
     @Operation(summary = "Create a new community", description = "Creates a new community with the provided details.")
-    @ApiResponses( value = {
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Community created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
     })
     public ResponseEntity<CommunityResource> createCommunity(@RequestBody CreateCommunityResource communityResource) {
-        var createdCommunityCommand = CreateCommunityCommandFromResourceAssembler.toCommandFromResource(communityResource);
+        var createdCommunityCommand = CreateCommunityCommandFromResourceAssembler
+                .toCommandFromResource(communityResource);
         var community = communityCommandService.handle(createdCommunityCommand);
         if (community.getId() == null || community.getId() <= 0)
             return ResponseEntity.badRequest().build();
@@ -57,10 +60,11 @@ public class CommunitiesController {
     @Operation(summary = "Get all communities", description = "Get all communities")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Communities found"),
-            @ApiResponse(responseCode = "404", description = "Communities not found")})
+            @ApiResponse(responseCode = "404", description = "Communities not found") })
     public ResponseEntity<List<CommunityResource>> getAllCommunities() {
         var communities = communityQueryService.handle(new GetCommunitiesQuery());
-        if (communities.isEmpty()) return ResponseEntity.notFound().build();
+        if (communities.isEmpty())
+            return ResponseEntity.notFound().build();
         var communityResources = communities.stream()
                 .map(CommunityResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
@@ -71,10 +75,11 @@ public class CommunitiesController {
     @Operation(summary = "Get community by id", description = "Get community by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Community found"),
-            @ApiResponse(responseCode = "404", description = "Community not found")})
+            @ApiResponse(responseCode = "404", description = "Community not found") })
     public ResponseEntity<CommunityResource> getCommunityById(@PathVariable Long communityId) {
         var community = communityQueryService.handle(new GetCommunityByIdQuery(communityId));
-        if (community.isEmpty()) return ResponseEntity.notFound().build();
+        if (community.isEmpty())
+            return ResponseEntity.notFound().build();
         var communityEntity = community.get();
         var communityResource = CommunityResourceFromEntityAssembler.toResourceFromEntity(communityEntity);
         return ResponseEntity.ok(communityResource);
@@ -87,7 +92,8 @@ public class CommunitiesController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "Community not found")
     })
-    public ResponseEntity<CommunityResource> updateCommunity(@PathVariable Long id, @RequestBody UpdateCommunityResource updateResource) {
+    public ResponseEntity<CommunityResource> updateCommunity(@PathVariable Long id,
+            @RequestBody UpdateCommunityResource updateResource) {
 
         var updateCommand = UpdateCommunityCommandFromResourceAssembler.toCommandFromResource(id, updateResource);
         var updatedCommunity = communityCommandService.handle(updateCommand);
@@ -119,7 +125,7 @@ public class CommunitiesController {
     @Operation(summary = "Join to community", description = "Join to community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Join to Community successfully"),
-            @ApiResponse(responseCode = "404", description = "Join to Community failed")})
+            @ApiResponse(responseCode = "404", description = "Join to Community failed") })
     public ResponseEntity<Void> joinCommunity(@PathVariable Long communityId, @RequestParam Long userId) {
         communityCommandService.handle(new JoinCommunityCommand(communityId, userId));
         return ResponseEntity.ok().build();
@@ -129,9 +135,28 @@ public class CommunitiesController {
     @Operation(summary = "Leave to community", description = "Leave to community")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Leave to Community successfully"),
-            @ApiResponse(responseCode = "404", description = "Leave to Community failed")})
+            @ApiResponse(responseCode = "404", description = "Leave to Community failed") })
     public ResponseEntity<Void> leaveCommunity(@PathVariable Long communityId, @RequestParam Long userId) {
         communityCommandService.handle(new LeaveCommunityCommand(communityId, userId));
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/joined/{userId}")
+    @Operation(summary = "Get all communities joined by a User", description = "Get all communities joined by a User")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Communities joined retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No communities joined found for the given User")
+    })
+    public ResponseEntity<List<CommunityResource>> getAllCommunitiesJoinedByUserId(@PathVariable Long userId) {
+        var communitiesJoined = this.communityQueryService.handle(new GetAllCommunitiesJoinedByUserIdQuery(userId));
+
+        if (communitiesJoined.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        var communitiesJoinedResources = communitiesJoined.stream()
+                .map(CommunityResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(communitiesJoinedResources);
     }
 }

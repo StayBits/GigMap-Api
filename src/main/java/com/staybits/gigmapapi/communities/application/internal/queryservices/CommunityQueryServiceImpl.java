@@ -3,6 +3,7 @@ package com.staybits.gigmapapi.communities.application.internal.queryservices;
 import org.springframework.stereotype.Service;
 
 import com.staybits.gigmapapi.communities.domain.model.aggregates.Community;
+import com.staybits.gigmapapi.communities.domain.model.queries.GetAllCommunitiesJoinedByUserIdQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetCommunitiesQuery;
 import com.staybits.gigmapapi.communities.domain.model.queries.GetCommunityByIdQuery;
 import com.staybits.gigmapapi.communities.domain.services.CommunityQueryService;
@@ -27,5 +28,10 @@ public class CommunityQueryServiceImpl implements CommunityQueryService {
     @Override
     public List<Community> handle(GetCommunitiesQuery query) {
         return communityRepository.findAll();
+    }
+
+    @Override
+    public List<Community> handle(GetAllCommunitiesJoinedByUserIdQuery query) {
+        return this.communityRepository.findByMembers_Id(query.userId());
     }
 }
