@@ -45,11 +45,13 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         // Check if user already exists
         if (userRepository.existsByEmail(request.email())) {
+            System.out.println("❌ Register failed: email already exists - " + request.email());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("Email already registered"));
         }
         
         if (userRepository.existsByUsername(request.username())) {
+            System.out.println("❌ Register failed: username already taken - " + request.username());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("Username already taken"));
         }
@@ -77,6 +79,7 @@ public class AuthController {
             "User registered successfully"
         );
         
+        System.out.println("✅ User registered: " + savedUser.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -93,12 +96,14 @@ public class AuthController {
                 .orElse(null));
         
         if (user == null) {
+            System.out.println("❌ Login failed: user not found - " + request.emailOrUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse("Invalid credentials"));
         }
         
         // Verify password
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            System.out.println("❌ Login failed: invalid password for " + user.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse("Invalid credentials"));
         }
@@ -120,6 +125,7 @@ public class AuthController {
             "Login successful"
         );
         
+        System.out.println("✅ User logged in: " + user.getEmail());
         return ResponseEntity.ok(response);
     }
 

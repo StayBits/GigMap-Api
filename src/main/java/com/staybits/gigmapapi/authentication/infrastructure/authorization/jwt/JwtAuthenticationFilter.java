@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (jwtService.validateToken(token)) {
                     Long userId = jwtService.getUserIdFromToken(token);
                     
+                    System.out.println(":V JWT validated for user: " + userId);
                     // Create authentication object
                     UsernamePasswordAuthenticationToken authentication = 
                         new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
@@ -51,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             } catch (Exception e) {
                 // Invalid token - authentication will remain null
-                logger.error("JWT validation failed: " + e.getMessage());
+                System.out.println("❌ JWT validation failed: " + e.getMessage());
             }
         }
         
