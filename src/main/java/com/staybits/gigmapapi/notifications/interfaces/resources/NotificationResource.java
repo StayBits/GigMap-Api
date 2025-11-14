@@ -1,5 +1,12 @@
 package com.staybits.gigmapapi.notifications.interfaces.resources;
 
-public record NotificationResource() {
-    
-}
+import java.time.LocalDateTime;
+
+public record NotificationResource(
+        Long id,
+        Long userId,
+        String title,
+        String body,
+        LocalDateTime createdAt,
+        LocalDateTime readAt
+) {}

@@ -17,6 +17,14 @@ public class Notification extends AuditableAbstractAggregateRoot<Notification>{
     @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserNotification> userNotifications = new ArrayList<>();
 
+    public String getBody() {
+        return this.body;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
     public Notification() {}
 
     public Notification(String title, String body) {

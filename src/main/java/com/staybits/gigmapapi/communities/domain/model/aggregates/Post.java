@@ -42,6 +42,6 @@ public class Post extends AuditableAbstractAggregateRoot<Post> {
         this.community = community;
         this.user = user;
 
-        registerEvent(new PostCreatedEvent(this.getId(), this.content, this.community.getName(), this.user.getUsername()));
+        registerEvent(new PostCreatedEvent(this.getId(), this.content, this.community.getName(), this.user.getUsername(), this.user.getId()));
     }
 }

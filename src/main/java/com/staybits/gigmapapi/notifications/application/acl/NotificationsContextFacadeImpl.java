@@ -33,7 +33,7 @@ public class NotificationsContextFacadeImpl implements NotificationsContextFacad
     }
 
     @Override
-    public void notifyAllUsersOfNewPost(Long postId, String postContent, String communityName, String username) {
+    public void notifyAllUsersOfNewPost(Long postId, String postContent, String communityName, String username, Long userId) {
         String title = username + " en " + communityName;
         String body = postContent.length() > 100 ? postContent.substring(0, 100) + "..." : postContent;
 
@@ -48,6 +48,10 @@ public class NotificationsContextFacadeImpl implements NotificationsContextFacad
         List<DeviceToken> tokens = deviceTokenRepository.findAll();
 
         for (DeviceToken token : tokens) {
+            if (token.getUserId().equals(userId)) {
+                continue;
+            }
+
             UserNotification newUserNotification = new UserNotification(token.getUserId(), newNotification);
 
             try {
