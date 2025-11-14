@@ -18,7 +18,7 @@ RUN mvn clean package -DskipTests
 RUN ls -la target
 
 # Imagen final
-FROM openjdk:17-alpine
+FROM openjdk:17-jre-alpine
 
 WORKDIR /app
 
